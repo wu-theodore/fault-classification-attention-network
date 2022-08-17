@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 
-from attention_network.model.modules.MultiHeadAttention import MultiHeadAttention
-from attention_network.model.modules.PositionalFF import PositionalFeedForward
-from attention_network.model.modules.ResidualAddAndNorm import ResidualAddAndNorm
+from model.modules.MultiHeadAttention import MultiHeadAttention
+from model.modules.PositionalFF import PositionalFeedForward
+from model.modules.ResidualAddAndNorm import ResidualAddAndNorm
 
 class EncoderStack(nn.Module):
     def __init__(self, model_size, key_size, value_size, num_heads, feedforward_size):

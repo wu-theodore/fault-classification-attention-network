@@ -2,11 +2,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from attention_network.model.modules.PositionalEncoding import PositionalEncoding
-from attention_network.model.modules.EncoderStack import EncoderStack
+from model.modules.PositionalEncoding import PositionalEncoding
+from model.modules.EncoderStack import EncoderStack
 
 class AttentionNetwork(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, device="cuda"):
         super().__init__()
 
         # Unpack config
@@ -19,6 +19,7 @@ class AttentionNetwork(nn.Module):
         num_encoders = config["num_encoders"]
         num_classes = config["num_classes"]
 
+        self.device = device
         self.input_embedding = nn.Linear(state_size, model_size)
         self.positional_encoding = PositionalEncoding(model_size)
 
@@ -29,6 +30,8 @@ class AttentionNetwork(nn.Module):
             ]
         )
         self.classification_layer = nn.Linear(model_size, num_classes)
+        self.softmax = nn.Softmax(dim=1)
+
 
     def forward(self, input):
         """
@@ -42,7 +45,9 @@ class AttentionNetwork(nn.Module):
             stacked_attention_weights: The attention weights for each encoder layer in the network.
         """
         seq_len = input.shape[1]
-        embedding = self.input_embedding(input) + self.positional_encoding.generate_encoding()[:seq_len]
+        pos_encoding = self.positional_encoding.generate_encoding()[:seq_len]
+        pos_encoding = pos_encoding.to(self.device)
+        embedding = self.input_embedding(input) + pos_encoding
 
         # Keep track of states throughout the model.
         attention_weights_list = []
@@ -53,11 +58,12 @@ class AttentionNetwork(nn.Module):
             embedding_list.append(embedding)
             attention_weights_list.append(attention_weights)
 
-        stacked_attention_weights = torch.stack(attention_weights_list)
-        stacked_embeddings = torch.stack(embedding_list)
+        #stacked_attention_weights = torch.stack(attention_weights_list)
+        #stacked_embeddings = torch.stack(embedding_list)
 
         reduced_embedding = torch.mean(embedding, dim=1)
-        output = self.classification_layer(reduced_embedding)
+        logits = self.classification_layer(reduced_embedding)
+        normalized_logits = self.softmax(logits)
 
-        return output, stacked_embeddings, stacked_attention_weights
+        return normalized_logits
 

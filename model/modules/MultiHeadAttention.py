@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from attention_network.model.modules.ScaledDotProductAttention import ScaledDotProductAttention
+from .ScaledDotProductAttention import ScaledDotProductAttention
 
 class MultiHeadAttention(nn.Module):
     def __init__(self, model_size, key_size, value_size, num_heads):

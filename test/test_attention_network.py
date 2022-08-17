@@ -38,9 +38,9 @@ def test_output_sizes():
     embedding = torch.ones(size=(batch_size, num_queries, state_size), dtype=torch.float)
     
     network = AttentionNetwork(config)
-    output_logits, embeddings, attention_weights = network(embedding)
+    output_logits = network(embedding)
 
     assert(tuple(output_logits.shape) == (batch_size, num_classes))
-    assert(tuple(attention_weights.shape) == (num_encoders, batch_size, num_queries, num_queries * num_heads))
-    assert(tuple(embeddings.shape) == (num_encoders + 1, batch_size, num_queries, model_size))
+    #assert(tuple(attention_weights.shape) == (num_encoders, batch_size, num_queries, num_queries * num_heads))
+    #assert(tuple(embeddings.shape) == (num_encoders + 1, batch_size, num_queries, model_size))
 

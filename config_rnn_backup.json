@@ -1,0 +1,25 @@
+{
+    "data_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\simulation_data_csv",
+    "save_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\metrics",
+    "model_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\onnx",
+
+    "epochs": 50,
+    "batch_size": 100,
+    "learning_rate": 0.001,
+    "train_val_split": 0.80,
+    "model": "rnn",
+
+    "state_size": 4,
+    "model_size": 20,
+    "key_size": 20,
+    "value_size": 100,
+    "num_heads": 5,
+    "feedforward_size": 15,
+    "num_encoders": 1,
+
+    "num_classes": 5,
+
+    "dropout": 0.2,
+
+    "verbosity": 1
+}

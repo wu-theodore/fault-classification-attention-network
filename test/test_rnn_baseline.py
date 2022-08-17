@@ -16,7 +16,8 @@ config = {
     "model_size": model_size,
     "value_size": value_size,
     "num_encoders": num_encoders,
-    "num_classes": num_classes
+    "num_classes": num_classes,
+    "dropout": 0.2
 }
 
 def test_import():

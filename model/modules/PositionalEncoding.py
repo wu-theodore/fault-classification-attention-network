@@ -21,7 +21,7 @@ class PositionalEncoding:
         sin_terms = torch.sin(trig_args)
         cos_terms = torch.cos(trig_args)
 
-        pos_encodings = torch.zeros((max_seq_len, self.model_size))
+        pos_encodings = torch.zeros((max_seq_len, self.model_size), dtype=torch.float32)
         pos_encodings[:, 0::2] = sin_terms
         pos_encodings[:, 1::2] = cos_terms
 
