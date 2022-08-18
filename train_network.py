@@ -1,5 +1,6 @@
 import os
 import json
+import wandb
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -64,7 +65,7 @@ def validate(device, model, data_loader, criterion):
     val_accuracy = running_batch_accuracy / batch_num
     return val_loss, val_accuracy
 
-def train(config, device, model, data, criterion, optimizer, print_every=100, save_every=10, use_checkpoint=False):
+def train(config, device, model, data, criterion, optimizer, print_every=100, save_every=10, use_checkpoint=False, use_wandb=False):
     # Load checkpoint if exists and desired.
     checkpoint_path = "checkpoint.pt"
     start_epoch = 0
@@ -101,6 +102,16 @@ def train(config, device, model, data, criterion, optimizer, print_every=100, sa
         val_history['accuracy'].append(val_accuracy)
         val_history['epoch_num'] += 1
 
+        # Log to wandb if using
+        if use_wandb:
+            wandb.log({
+                "train_loss": train_loss,
+                "train_accuracy": train_accuracy,
+                "validation_loss": val_loss,
+                "validation_accuracy": val_accuracy,
+                "epoch": epoch
+            })
+
         # Display stats
         if (epoch + 1) % print_every == 0:
             print("-------------------------------")
@@ -122,7 +133,6 @@ def train(config, device, model, data, criterion, optimizer, print_every=100, sa
             }, checkpoint_path)
 
     return train_history, val_history
-
 
 def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -156,4 +166,5 @@ def main():
 if __name__ == "__main__":
     torch.manual_seed(0)
     main()
+
 

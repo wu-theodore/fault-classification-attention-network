@@ -5,10 +5,11 @@ from torch.utils.data import DataLoader, random_split
 
 from model.AttentionNetwork import AttentionNetwork
 from model.RNNBaseline import RNNBaseline
-from CAVSignalDataset import CAVSignalDataset
+from utils.CAVSignalDataset import CAVSignalDataset
+from utils.Transforms import MinMaxScale
 
 def load_data(data_dir, train_split, batch_size=100, shuffle=True):
-    dataset = CAVSignalDataset(data_dir)
+    dataset = CAVSignalDataset(data_dir, transform=MinMaxScale())
     dataset_size = len(dataset)
     split_size = int(dataset_size * train_split)
     print(f"Splitting dataset with {split_size} samples in train and {dataset_size - split_size} samples in val")

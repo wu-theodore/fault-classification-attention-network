@@ -3,23 +3,21 @@
     "save_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\metrics",
     "model_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\onnx",
 
-    "epochs": 50,
+    "epochs": 100,
     "batch_size": 100,
     "learning_rate": 0.001,
     "train_val_split": 0.80,
     "model": "rnn",
 
     "state_size": 4,
-    "model_size": 20,
+    "model_size": 64,
     "key_size": 20,
-    "value_size": 100,
+    "value_size": 256,
     "num_heads": 5,
     "feedforward_size": 15,
     "num_encoders": 1,
 
     "num_classes": 5,
-
-    "dropout": 0.2,
 
     "verbosity": 1
 }

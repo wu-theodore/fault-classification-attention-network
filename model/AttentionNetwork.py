@@ -12,8 +12,9 @@ class AttentionNetwork(nn.Module):
         # Unpack config
         state_size = config["state_size"]
         model_size = config["model_size"]
-        key_size = config["key_size"]
         value_size = config["value_size"]
+        #key_size = config["key_size"]
+        key_size = value_size
         num_heads = config["num_heads"]
         feedforward_size = config["feedforward_size"]
         num_encoders = config["num_encoders"]

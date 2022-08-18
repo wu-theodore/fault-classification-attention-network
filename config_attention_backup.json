@@ -19,7 +19,5 @@
 
     "num_classes": 5,
 
-    "dropout": 0.2,
-
     "verbosity": 1
 }
