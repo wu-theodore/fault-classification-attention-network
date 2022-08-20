@@ -27,17 +27,13 @@ if __name__ == "__main__":
     sweep_config = {
         "name": "test_sweep",
         "method": "random",
-        "early_terminate": {
-            "type": "hyperband",
-            "min_iter": 4
-        },
         "metric": {
             "name": "validation_loss",
             "goal": "minimize"
         },
         "parameters": {
             "data_dir": {
-                "value": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\simulation_data_4_vehicles"
+                "value": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\simulation_data_3_vehicles"
             },
             "train_val_split": {
                 "value": 0.80
@@ -52,7 +48,7 @@ if __name__ == "__main__":
                 "value": 200
             },
             "state_size": {
-                "value": 4
+                "value": 3
             },
             "num_classes": {
                 "value": 5
@@ -85,5 +81,5 @@ if __name__ == "__main__":
 
     sweep_count = 1
     project_name = "fault_classification_cav"
-    sweep_id = wandb.sweep(sweep_config)
-    wandb.agent(sweep_id, function=sweep, project=project_name, count=sweep_count)
+    sweep_id = wandb.sweep(sweep_config, project=project_name)
+    wandb.agent(sweep_id, function=sweep, count=sweep_count)
