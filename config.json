@@ -1,5 +1,5 @@
 {
-    "data_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\simulation_data_4_vehicles",
+    "data_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\simulation_data_3_vehicles",
     "save_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\metrics",
     "model_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\onnx",
 
@@ -7,9 +7,9 @@
     "batch_size": 100,
     "learning_rate": 0.001,
     "train_val_split": 0.80,
-    "model": "rnn",
+    "model": "attention",
 
-    "state_size": 4,
+    "state_size": 3,
     "model_size": 64,
     "key_size": 20,
     "value_size": 256,

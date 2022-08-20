@@ -20,7 +20,8 @@ def sweep():
         optimizer = optim.Adam(model.parameters(), lr=config["learning_rate"])
 
         # Train model
-        train(config, device, model, (train_loader, val_loader), criterion, optimizer, print_every=config["verbosity"], use_wandb=True)
+        train(config, device, model, (train_loader, val_loader), criterion, optimizer, 
+              print_every=config["verbosity"], use_wandb=True, early_stop=True)
 
 if __name__ == "__main__":
     sweep_config = {

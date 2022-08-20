@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+from utils.EarlyStopping import EarlyStopping
 from utils.plot_utils import plot_history
 from utils.save_utils import save_metrics_history, save_model
 from utils.train_utils import *
@@ -65,7 +66,10 @@ def validate(device, model, data_loader, criterion):
     val_accuracy = running_batch_accuracy / batch_num
     return val_loss, val_accuracy
 
-def train(config, device, model, data, criterion, optimizer, print_every=100, save_every=10, use_checkpoint=False, use_wandb=False):
+def train(config, device, model, data, criterion, optimizer, print_every=100, save_every=10, use_checkpoint=False, use_wandb=False, early_stop=False):
+    if early_stop:
+        early_stopping = EarlyStopping()
+
     # Load checkpoint if exists and desired.
     checkpoint_path = "checkpoint.pt"
     start_epoch = 0
@@ -112,6 +116,11 @@ def train(config, device, model, data, criterion, optimizer, print_every=100, sa
                 "epoch": epoch
             })
 
+        if early_stop:
+            stop = early_stopping(val_loss, model)
+            if stop:
+                break
+
         # Display stats
         if (epoch + 1) % print_every == 0:
             print("-------------------------------")
@@ -152,7 +161,8 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=config["learning_rate"])
 
     # Train model
-    train_history, val_history = train(config, device, model, (train_loader, val_loader), criterion, optimizer, print_every=config["verbosity"])
+    train_history, val_history = train(config, device, model, (train_loader, val_loader),
+        criterion, optimizer, early_stop=True, print_every=config["verbosity"])
 
     # Plot/Save results
     plot_history(train_history, val_history, save_dir=os.path.join(config["save_dir"], config["model"]))
