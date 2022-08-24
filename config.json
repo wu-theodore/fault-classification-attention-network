@@ -1,6 +1,7 @@
 {
-    "data_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\simulation_data_3_vehicles",
-    "save_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\metrics",
+    "train_data_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\simulation_data_3v",
+    "test_data_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\test_data",
+    "save_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\results",
     "model_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\onnx",
 
     "epochs": 100,
@@ -10,9 +11,9 @@
     "model": "attention",
 
     "state_size": 3,
-    "model_size": 64,
+    "model_size": 16,
     "key_size": 20,
-    "value_size": 256,
+    "value_size": 64,
     "num_heads": 5,
     "feedforward_size": 15,
     "num_encoders": 1,

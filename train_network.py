@@ -38,6 +38,7 @@ def train_one_epoch(device, model, data_loader, criterion, optimizer):
 
     train_loss = running_loss / batch_num
     train_accuracy = running_batch_accuracy / batch_num
+    torch.cuda.empty_cache()
     return train_loss, train_accuracy
 
 
@@ -45,22 +46,23 @@ def validate(device, model, data_loader, criterion):
     running_loss = 0.0
     running_batch_accuracy = 0.0
     batch_num = 0
-
-    model.eval()
-    for i, data in enumerate(data_loader, 0):
-        inputs, labels = data
-        inputs = inputs.float().to(device)
-        labels = labels.to(device)
-        
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
-        
-        batch_accuracy = compute_batch_accuracy(outputs.detach(), labels)
-        batch_loss = loss.item()
-        
-        running_batch_accuracy += batch_accuracy
-        running_loss += batch_loss
-        batch_num += 1
+    
+    with torch.no_grad():
+        model.eval()
+        for i, data in enumerate(data_loader, 0):
+            inputs, labels = data
+            inputs = inputs.float().to(device)
+            labels = labels.to(device)
+            
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            
+            batch_accuracy = compute_batch_accuracy(outputs.detach(), labels)
+            batch_loss = loss.item()
+            
+            running_batch_accuracy += batch_accuracy
+            running_loss += batch_loss
+            batch_num += 1
 
     val_loss = running_loss / batch_num
     val_accuracy = running_batch_accuracy / batch_num
@@ -151,7 +153,7 @@ def main():
         config = json.load(f)
 
     # Instantiate DataLoaders
-    train_loader, val_loader = load_data(config["data_dir"], config["train_val_split"], batch_size=config["batch_size"])
+    train_loader, val_loader = load_data(config["train_data_dir"], config["train_val_split"], batch_size=config["batch_size"])
 
     # Instantiate Networks
     model = load_model(config, device)
