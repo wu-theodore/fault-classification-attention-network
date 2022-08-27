@@ -38,7 +38,7 @@ def visualize_data():
     with open("config.json", 'r') as f:
         config = json.load(f)
 
-    train_loader, _ = load_data(config["train_data_dir"], train_split=0.99, batch_size=1)
+    train_loader, _ = load_data(config["train_data_dir"], train_split=0.99, batch_size=1, shuffle=True)
     test_loader = load_test_data(config["test_data_dir"])
 
     visualize_signal(train_loader, title="Training Data Signal", save=True, save_dir=os.path.join(config["save_dir"], "train_data_distribution"))

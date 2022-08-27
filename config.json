@@ -1,6 +1,6 @@
 {
     "train_data_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\simulation_data_3v",
-    "test_data_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\test_data",
+    "test_data_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\test_data_reformatted",
     "save_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\results",
     "model_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\onnx",
 
@@ -12,10 +12,9 @@
 
     "state_size": 3,
     "model_size": 16,
-    "key_size": 20,
     "value_size": 64,
     "num_heads": 5,
-    "feedforward_size": 15,
+    "feedforward_size": 16,
     "num_encoders": 1,
 
     "num_classes": 5,
