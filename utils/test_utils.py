@@ -5,6 +5,16 @@ from torch.utils.data import DataLoader
 
 from utils.CAVSignalDataset import CAVSignalDataset
 from utils.Transforms import MinMaxScale, Sample, Compose
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
+
+label_map = {
+        0: "Actuator",
+        1: "FDI",
+        2: "DoS",
+        3: "Distracted",
+        4: "Drunk",
+    }
 
 def load_test_data(data_dir, batch_size=1, shuffle=True):
     transforms = Compose([MinMaxScale(), Sample(sample_freq=2)])
@@ -31,22 +41,27 @@ def compare_pred_result(output, label, criterion):
     if type(output) != torch.TensorType:
         output = torch.tensor(output, dtype=torch.float)
 
-    label_map = {
-        0: "actuator",
-        1: "attack",
-        2: "delay",
-        3: "distracted",
-        4: "drunk",
-    }
     loss = criterion(output, label).item()
     pred = torch.argmax(output, dim=1)
     correct = (pred == label).item()
     print(f"Model predicted class {label_map[pred.item()]}, true class was {label_map[label.item()]}")
-    return loss, correct
+    return loss, pred, correct
 
-def save_results(loss, acc, file_path):
-    with open(file_path, 'w') as f:
+def save_results(loss, acc, save_path):
+    with open(save_path, 'w') as f:
         f.write(f"Test Loss: {loss}\n")
         f.write(f"Test Accuracy: {acc}")
     
-
+def create_confusion_matrix(output, label, save_path=None, show=False):
+    cm = confusion_matrix(label, output)
+    cm_display = ConfusionMatrixDisplay(cm, display_labels=label_map.values())
+    cm_display.plot(colorbar=False, cmap="Blues")
+    font = {'fontname':'Times New Roman', 'fontsize':16}
+    plt.xlabel("Predicted Label", **font)
+    plt.xticks(**font)
+    plt.ylabel("True Label", **font)
+    plt.yticks(**font)
+    if save_path:
+        plt.savefig(save_path, format='eps')
+    if show:
+        plt.show()

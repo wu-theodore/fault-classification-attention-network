@@ -164,12 +164,12 @@ def main():
 
     # Train model
     train_history, val_history = train(config, device, model, (train_loader, val_loader),
-        criterion, optimizer, early_stop=True, print_every=config["verbosity"])
+        criterion, optimizer, early_stop=False, print_every=config["verbosity"])
 
     # Plot/Save results
-    plot_history(train_history, val_history, save_dir=os.path.join(config["save_dir"], config["model"]))
-    save_metrics_history(train_history, save_path=os.path.join(config["save_dir"], config["model"] + "_train_history")) 
-    save_metrics_history(val_history, save_path=os.path.join(config["save_dir"], config["model"] + "_val_history")) 
+    plot_history(train_history, val_history, save_dir=os.path.join(config["save_dir"], f"{config['model']}_training_curves.png"))
+    save_metrics_history(train_history, save_path=os.path.join(config["save_dir"], f"{config['model']}_train_history")) 
+    save_metrics_history(val_history, save_path=os.path.join(config["save_dir"], f"{config['model']}_val_history")) 
 
     # Save trained model
     sample_input = torch.randn(size=(config["batch_size"], 500, config["state_size"])).to(device)

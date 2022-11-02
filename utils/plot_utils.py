@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 def plot_history(train_history, val_history, show=True, save_dir=None):
     x_train = np.arange(train_history['epoch_num'])
     x_val = np.arange(val_history['epoch_num'])
-    fig, axes = plt.subplots(1, 2)
+    fig, axes = plt.subplots(1, 2, figsize=(12, 6))
 
     plot_curve(axes[0], x_train, train_history["loss"], label="Train", title="Loss Curve", ylabel="Loss")
     plot_curve(axes[0], x_val, val_history["loss"], label="Validation", title="Loss Curve", ylabel="Loss")

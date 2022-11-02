@@ -4,17 +4,17 @@
     "save_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\results",
     "model_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\onnx",
 
-    "epochs": 100,
+    "epochs": 150,
     "batch_size": 100,
     "learning_rate": 0.001,
     "train_val_split": 0.80,
     "model": "attention",
 
     "state_size": 3,
-    "model_size": 16,
-    "value_size": 64,
-    "num_heads": 5,
-    "feedforward_size": 16,
+    "model_size": 64,
+    "value_size": 256,
+    "num_heads": 3,
+    "feedforward_size": 64,
     "num_encoders": 1,
 
     "num_classes": 5,

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from utils.test_utils import load_test_data
 from utils.train_utils import load_data
 
-def visualize_signal(data_loader, title=None, show=True, save=False, save_dir=None):
+def visualize_signal(data_loader, title=None, show=True, save_dir=None):
     label_map = {
         0: "actuator",
         1: "attack",
@@ -29,7 +29,7 @@ def visualize_signal(data_loader, title=None, show=True, save=False, save_dir=No
 
                 break
     
-    if save:
+    if save_dir:
         plt.savefig(save_dir)
     if show:
         plt.show()
@@ -41,8 +41,8 @@ def visualize_data():
     train_loader, _ = load_data(config["train_data_dir"], train_split=0.99, batch_size=1, shuffle=True)
     test_loader = load_test_data(config["test_data_dir"])
 
-    visualize_signal(train_loader, title="Training Data Signal", save=True, save_dir=os.path.join(config["save_dir"], "train_data_distribution"))
-    visualize_signal(test_loader, title="Test Data Signal", save=True, save_dir=os.path.join(config["save_dir"], "test_data_distribution"))
+    visualize_signal(train_loader, title="Training Data Signal", save_dir=os.path.join(config["save_dir"], "train_data_distribution"))
+    visualize_signal(test_loader, title="Test Data Signal", save_dir=os.path.join(config["save_dir"], "test_data_distribution"))
 
 
 if __name__ == "__main__":
