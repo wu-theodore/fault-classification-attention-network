@@ -14,7 +14,7 @@ class ScaledDotProductAttention(nn.Module):
         self.W_K = nn.Linear(self.model_size, self.key_size)
         self.W_V = nn.Linear(self.model_size, self.value_size)
 
-        self.softmax = nn.Softmax(dim=2)
+        self.softmax = nn.Softmax(dim=-1)
         self.scaling_factor = torch.rsqrt(
             torch.tensor(self.key_size, dtype=torch.float)
         )

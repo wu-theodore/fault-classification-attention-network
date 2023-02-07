@@ -9,6 +9,10 @@
     "learning_rate": 0.001,
     "train_val_split": 0.80,
     "model": "attention",
+    "use_early_stop": true,
+    "early_stop_patience": 10,
+    "use_wandb": false,
+    "use_checkpoint": false,
 
     "state_size": 3,
     "model_size": 64,

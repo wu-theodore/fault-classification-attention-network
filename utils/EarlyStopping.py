@@ -2,7 +2,7 @@ import numpy as np
 import torch
 
 class EarlyStopping(object):
-    def __init__(self, patience=10, delta=0.01, checkpoint_path='early_stop_model.pt', save_checkpoints=False):
+    def __init__(self, patience=10, delta=0.01, checkpoint_path='early_stop_model.pt', save_checkpoints=True):
         self.patience = patience
         self.delta = delta
         self.checkpoint_path = checkpoint_path
@@ -15,6 +15,7 @@ class EarlyStopping(object):
             self.counter += 1
             if self.counter >= self.patience:
                 print(f"Early stopping due to no improvement in validation loss for {self.patience} epochs")
+                model.load_state_dict(torch.load(self.checkpoint_path))
                 return True
         else:
             self.min_loss = val_loss

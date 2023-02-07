@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 from utils.EarlyStopping import EarlyStopping
-from utils.plot_utils import plot_history
+from utils.plot_utils import plot_history, plot_attention_weights_heatmap
 from utils.save_utils import save_metrics_history, save_model
 from utils.train_utils import *
 
@@ -25,6 +25,9 @@ def train_one_epoch(device, model, data_loader, criterion, optimizer):
         optimizer.zero_grad()
         
         outputs = model(inputs)
+        if type(outputs) == tuple:
+            outputs, weights, embeddings = outputs
+
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
@@ -55,6 +58,9 @@ def validate(device, model, data_loader, criterion):
             labels = labels.to(device)
             
             outputs = model(inputs)
+            if type(outputs) == tuple:
+                outputs, weights, embeddings = outputs
+
             loss = criterion(outputs, labels)
             
             batch_accuracy = compute_batch_accuracy(outputs.detach(), labels)
@@ -63,14 +69,17 @@ def validate(device, model, data_loader, criterion):
             running_batch_accuracy += batch_accuracy
             running_loss += batch_loss
             batch_num += 1
-
+            
     val_loss = running_loss / batch_num
     val_accuracy = running_batch_accuracy / batch_num
     return val_loss, val_accuracy
 
-def train(config, device, model, data, criterion, optimizer, print_every=100, save_every=10, use_checkpoint=False, use_wandb=False, early_stop=False):
-    if early_stop:
-        early_stopping = EarlyStopping()
+def train(config, device, model, data, criterion, optimizer, print_every=100, save_every=10, use_checkpoint=False):
+    use_wandb = config["use_wandb"]
+    use_checkpoint = config["use_checkpoint"]
+    use_early_stop = config["use_early_stop"]
+    if use_early_stop:
+        early_stopping = EarlyStopping(patience=config["early_stop_patience"])
 
     # Load checkpoint if exists and desired.
     checkpoint_path = "checkpoint.pt"
@@ -118,7 +127,7 @@ def train(config, device, model, data, criterion, optimizer, print_every=100, sa
                 "epoch": epoch
             })
 
-        if early_stop:
+        if use_early_stop:
             stop = early_stopping(val_loss, model)
             if stop:
                 break
@@ -164,9 +173,11 @@ def main():
 
     # Train model
     train_history, val_history = train(config, device, model, (train_loader, val_loader),
-        criterion, optimizer, early_stop=False, print_every=config["verbosity"])
+        criterion, optimizer, print_every=config["verbosity"])
 
     # Plot/Save results
+    if config["model"] == "attention":
+        plot_attention_weights_heatmap(device, model, val_loader, save_dir=os.path.join(config["save_dir"], f"{config['model']}_attention_heatmap.png"))
     plot_history(train_history, val_history, save_dir=os.path.join(config["save_dir"], f"{config['model']}_training_curves.png"))
     save_metrics_history(train_history, save_path=os.path.join(config["save_dir"], f"{config['model']}_train_history")) 
     save_metrics_history(val_history, save_path=os.path.join(config["save_dir"], f"{config['model']}_val_history")) 
