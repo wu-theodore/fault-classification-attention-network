@@ -162,25 +162,36 @@ def main():
         config = json.load(f)
 
     # Instantiate DataLoaders
-    train_loader, val_loader = load_data(config["train_data_dir"], config["train_val_split"], batch_size=config["batch_size"])
+    data_loaders = load_data(config["train_data_dir"], batch_size=config["batch_size"], num_folds=config["num_folds"])
+    train_history_list = list()
+    val_history_list = list()
 
-    # Instantiate Networks
-    model = load_model(config, device)
+    for fold, (train_loader, val_loader) in enumerate(data_loaders):
+        print("\nTraining fold {}:".format(fold))
 
-    # Define optimizer
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=config["learning_rate"])
+        # Instantiate Networks
+        model = load_model(config, device)
 
-    # Train model
-    train_history, val_history = train(config, device, model, (train_loader, val_loader),
-        criterion, optimizer, print_every=config["verbosity"])
+        # Define optimizer
+        criterion = nn.CrossEntropyLoss()
+        optimizer = optim.Adam(model.parameters(), lr=config["learning_rate"])
 
-    # Plot/Save results
-    if config["model"] == "attention":
-        plot_attention_weights_heatmap(device, model, val_loader, save_dir=os.path.join(config["save_dir"], f"{config['model']}_attention_heatmap.png"))
-    plot_history(train_history, val_history, save_dir=os.path.join(config["save_dir"], f"{config['model']}_training_curves.png"))
-    save_metrics_history(train_history, save_path=os.path.join(config["save_dir"], f"{config['model']}_train_history")) 
-    save_metrics_history(val_history, save_path=os.path.join(config["save_dir"], f"{config['model']}_val_history")) 
+        # Train model
+        train_history, val_history = train(config, device, model, (train_loader, val_loader),
+            criterion, optimizer, print_every=config["verbosity"])
+        train_history['fold'] = fold
+        val_history['fold'] = fold
+        train_history_list.append(train_history)
+        val_history_list.append(val_history)
+
+        # Visualize attention weights
+        if config["model"] == "attention" and config["visualize"]:
+            plot_attention_weights_heatmap(device, model, val_loader, save_dir=os.path.join(config["save_dir"], f"{config['model']}_attention_heatmap.png"))
+
+    # Plot and save all results
+    plot_history(train_history_list, val_history_list, save_dir=os.path.join(config["save_dir"], f"{config['model']}_training_curves.png"))
+    save_metrics_history(train_history_list, save_path=os.path.join(config["save_dir"], f"{config['model']}_train_history")) 
+    save_metrics_history(val_history_list, save_path=os.path.join(config["save_dir"], f"{config['model']}_val_history")) 
 
     # Save trained model
     sample_input = torch.randn(size=(config["batch_size"], 500, config["state_size"])).to(device)

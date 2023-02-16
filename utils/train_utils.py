@@ -1,25 +1,33 @@
 import torch
 
 import torch
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader, SubsetRandomSampler
 
 from model.AttentionNetwork import AttentionNetwork
 from model.RNNBaseline import RNNBaseline
+from sklearn.model_selection import KFold
 from utils.CAVSignalDataset import CAVSignalDataset
 from utils.Transforms import MinMaxScale
 
-def load_data(data_dir, train_split, batch_size=100, shuffle=True):
+def load_data(data_dir, batch_size=100, shuffle=True, num_folds=5):
     dataset = CAVSignalDataset(data_dir, transform=MinMaxScale())
     dataset_size = len(dataset)
-    split_size = int(dataset_size * train_split)
-    print(f"Splitting dataset with {split_size} samples in train and {dataset_size - split_size} samples in val")
-    train_dataset, val_dataset = random_split(dataset, 
-        [split_size, dataset_size - split_size])
+    print(f"Dataset has {dataset_size} samples total.")
+    kfold = KFold(n_splits=num_folds, shuffle=True)
+    print(f"Splitting dataset with {int(dataset_size * (1 - 1/num_folds))} samples in train and {int(dataset_size * (1/num_folds))} samples in val")
+    
+    data_loaders = []
+    for fold, (train_idx, val_idx) in enumerate(kfold.split(dataset)):
+        
+        train_sampler = SubsetRandomSampler(train_idx)
+        val_sampler = SubsetRandomSampler(val_idx)
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=shuffle)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=shuffle)
+        train_loader = DataLoader(dataset, batch_size=batch_size, sampler=train_sampler)
+        val_loader = DataLoader(dataset, batch_size=batch_size, sampler=val_sampler)
+        
+        data_loaders.append((train_loader, val_loader))
 
-    return train_loader, val_loader
+    return data_loaders
 
 def load_model(config, device):
     model_type = config["model"]

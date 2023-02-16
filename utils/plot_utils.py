@@ -2,15 +2,17 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_history(train_history, val_history, show=True, save_dir=None):
-    x_train = np.arange(train_history['epoch_num'])
-    x_val = np.arange(val_history['epoch_num'])
-    fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+def plot_history(train_history_list, val_history_list, show=True, save_dir=None):
+    for i, (train_history, val_history) in enumerate(zip(train_history_list, val_history_list)):
+        if i == 0:
+            x_train = np.arange(train_history['epoch_num'])
+            x_val = np.arange(val_history['epoch_num'])
+            fig, axes = plt.subplots(1, 2, figsize=(12, 6))
 
-    plot_curve(axes[0], x_train, train_history["loss"], label="Train", title="Loss Curve", ylabel="Loss")
-    plot_curve(axes[0], x_val, val_history["loss"], label="Validation", title="Loss Curve", ylabel="Loss")
-    plot_curve(axes[1], x_train, train_history["accuracy"], label="Train", title="Accuracy Curve", ylabel="Accuracy")
-    plot_curve(axes[1], x_val, val_history["accuracy"],  label="Validation", title="Accuracy Curve", ylabel="Accuracy")
+        plot_curve(axes[0], x_train, train_history["loss"], label=f"Train_{i}", title="Loss Curve", ylabel="Loss")
+        plot_curve(axes[0], x_val, val_history["loss"], label=f"Validation_{i}", title="Loss Curve", ylabel="Loss")
+        plot_curve(axes[1], x_train, train_history["accuracy"], label=f"Train_{i}", title="Accuracy Curve", ylabel="Accuracy")
+        plot_curve(axes[1], x_val, val_history["accuracy"],  label=f"Validation_{i}", title="Accuracy Curve", ylabel="Accuracy")
     
     if save_dir:
         plt.savefig(save_dir)
@@ -45,7 +47,6 @@ def plot_attention_weights_heatmap(device, model, data_loader, show=True, save_d
             sample_label = labels[0].cpu().item()
             sample_weights = torch.squeeze(weights)[0, :, :].cpu().squeeze().numpy()
             plot_heatmap(sample_input, sample_label, sample_weights)
-            break
 
     if save_dir:
         plt.savefig(save_dir)
