@@ -9,7 +9,7 @@ from sklearn.model_selection import KFold
 from utils.CAVSignalDataset import CAVSignalDataset
 from utils.Transforms import MinMaxScale
 
-def load_data(data_dir, batch_size=100, shuffle=True, num_folds=5):
+def load_data(data_dir, batch_size=None, shuffle=True, num_folds=5):
     dataset = CAVSignalDataset(data_dir, transform=MinMaxScale())
     dataset_size = len(dataset)
     print(f"Dataset has {dataset_size} samples total.")
@@ -22,8 +22,12 @@ def load_data(data_dir, batch_size=100, shuffle=True, num_folds=5):
         train_sampler = SubsetRandomSampler(train_idx)
         val_sampler = SubsetRandomSampler(val_idx)
 
-        train_loader = DataLoader(dataset, batch_size=batch_size, sampler=train_sampler)
-        val_loader = DataLoader(dataset, batch_size=batch_size, sampler=val_sampler)
+        if not batch_size:
+            train_loader = DataLoader(dataset, batch_size=len(train_idx), sampler=train_sampler)
+            val_loader = DataLoader(dataset, batch_size=len(val_idx), sampler=val_sampler)
+        else:
+            train_loader = DataLoader(dataset, batch_size=batch_size, sampler=train_sampler)
+            val_loader = DataLoader(dataset, batch_size=batch_size, sampler=val_sampler)
         
         data_loaders.append((train_loader, val_loader))
 

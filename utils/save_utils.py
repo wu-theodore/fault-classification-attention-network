@@ -5,15 +5,19 @@ import onnxruntime
 import numpy as np
 import pandas as pd
 
-def save_metrics_history(history_list, save_path):
+def save_metrics_history(history_list, save_path, is_svm=False):
     if save_path[-4:] != ".csv":
         save_path += ".csv"
-    for idx, history in enumerate(history_list):
-        history["epoch_num"] = [i for i in range(history["epoch_num"])]
-        history["fold_num"] = [idx for i in range(len(history["epoch_num"]))] 
+    if not is_svm:
+        for idx, history in enumerate(history_list):
+            history["epoch_num"] = [i for i in range(history["epoch_num"])]
+            history["fold_num"] = [idx for i in range(len(history["epoch_num"]))] 
 
     metrics_df = pd.DataFrame.from_records(history_list)
-    metrics_df = metrics_df[["fold_num", "epoch_num", "loss", "accuracy"]]
+    if is_svm:
+        metrics_df = metrics_df[["fold", "accuracy"]]
+    else:
+        metrics_df = metrics_df[["fold_num", "epoch_num", "loss", "accuracy"]]
     metrics_df.to_csv(save_path, index=False)
 
 
