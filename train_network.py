@@ -158,7 +158,7 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"PyTorch running on {device}")
     
-    with open("config.json", 'r') as f:
+    with open("config_dnn.json", 'r') as f:
         config = json.load(f)
 
     # Instantiate DataLoaders
