@@ -15,7 +15,7 @@ class DNNBaseline(nn.Module):
         self.device = device
 
         self.hidden_layer_1 = nn.Linear(num_features, num_features)
-        self.hidden_layer_2 = nn.Linear(self.hidden_size, self.hidden_size)
+        self.hidden_layer_2 = nn.Linear(num_features, self.hidden_size)
         self.output_layer = nn.Linear(self.hidden_size, num_classes)
         self.softmax = nn.Softmax(dim=-1)
 

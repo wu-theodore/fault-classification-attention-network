@@ -9,6 +9,7 @@ from utils.EarlyStopping import EarlyStopping
 from utils.plot_utils import plot_history, plot_attention_weights_heatmap
 from utils.save_utils import save_metrics_history, save_model
 from utils.train_utils import *
+from utils.Transforms import *
 
 
 def train_one_epoch(device, model, data_loader, criterion, optimizer):
@@ -162,7 +163,11 @@ def main():
         config = json.load(f)
 
     # Instantiate DataLoaders
-    data_loaders = load_data(config["train_data_dir"], batch_size=config["batch_size"], num_folds=config["num_folds"])
+    if config["model"] == "dnn":
+        transform = Compose([ExtractTimeDomainFeatures(), MinMaxScale(1, 0)])
+    else:
+        transform = MinMaxScale()
+    data_loaders = load_data(config["train_data_dir"], batch_size=config["batch_size"], num_folds=config["num_folds"], transform=transform)
     train_history_list = list()
     val_history_list = list()
 
@@ -188,14 +193,20 @@ def main():
         if config["model"] == "attention" and config["visualize"]:
             plot_attention_weights_heatmap(device, model, val_loader, save_dir=os.path.join(config["save_dir"], f"{config['model']}_attention_heatmap.png"))
 
-    # Plot and save all results
-    plot_history(train_history_list, val_history_list, save_dir=os.path.join(config["save_dir"], f"{config['model']}_training_curves.png"))
+    # Save all results
     save_metrics_history(train_history_list, save_path=os.path.join(config["save_dir"], f"{config['model']}_train_history")) 
     save_metrics_history(val_history_list, save_path=os.path.join(config["save_dir"], f"{config['model']}_val_history")) 
 
     # Save trained model
-    sample_input = torch.randn(size=(config["batch_size"], 500, config["state_size"])).to(device)
+    if config["model"] == "dnn":
+        sample_input = torch.randn(size=(config["batch_size"], config["num_features"])).to(device)
+    else:
+        sample_input = torch.randn(size=(config["batch_size"], 500, config["state_size"])).to(device)
     save_model(model, sample_input, save_path=os.path.join(config["model_dir"], config["model"]))
+
+    # Plot history
+    plot_history(train_history_list, val_history_list, save_dir=os.path.join(config["save_dir"], f"{config['model']}_training_curves.png"))
+   
 
 if __name__ == "__main__":
     torch.manual_seed(0)

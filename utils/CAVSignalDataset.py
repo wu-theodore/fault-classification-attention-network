@@ -23,12 +23,13 @@ class CAVSignalDataset(Dataset):
     def __getitem__(self, index):
         file, label = self.labels[index]
         file_path = os.path.join(self.data_dir, label, file)
-        data = torch.tensor(np.loadtxt(file_path, delimiter=','), dtype=torch.float64).T
+        data = np.loadtxt(file_path, delimiter=',').T
         label = self.label_map[label]
         if self.transform:
             data = self.transform(data)
         if self.target_transform:
             label = self.target_transform(label)
+        data = torch.tensor(data, dtype=torch.float64)
         return data, label
 
     def get_labels(self, data_dir):

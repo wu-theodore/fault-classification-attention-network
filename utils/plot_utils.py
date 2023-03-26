@@ -5,9 +5,16 @@ import matplotlib.pyplot as plt
 def plot_history(train_history_list, val_history_list, show=True, save_dir=None):
     for i, (train_history, val_history) in enumerate(zip(train_history_list, val_history_list)):
         if i == 0:
-            x_train = np.arange(train_history['epoch_num'])
-            x_val = np.arange(val_history['epoch_num'])
             fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+
+        if type(train_history["epoch_num"]) == int:
+            x_train = np.arange(train_history['epoch_num'])
+        else:
+            x_train = np.array(train_history["epoch_num"])
+        if type(val_history["epoch_num"]) == int:
+            x_val = np.arange(val_history['epoch_num'])
+        else:
+            x_val = np.array(val_history["epoch_num"])
 
         plot_curve(axes[0], x_train, train_history["loss"], label=f"Train_{i}", title="Loss Curve", ylabel="Loss")
         plot_curve(axes[0], x_val, val_history["loss"], label=f"Validation_{i}", title="Loss Curve", ylabel="Loss")

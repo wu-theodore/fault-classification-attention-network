@@ -6,7 +6,7 @@ from utils.test_utils import load_test_data, create_onnxruntime_session, run_inf
 
 def test_network():
     # Load config
-    with open("config.json", 'r') as f:
+    with open("config_dnn.json", 'r') as f:
         config = json.load(f)
 
     # Load test data
@@ -37,7 +37,7 @@ def test_network():
     test_accuracy = num_correct / total_samples
 
     create_confusion_matrix(preds, labels, save_path=os.path.join(config["save_dir"], f"{config['model']}_cm.eps"), show=True)
-    save_results(test_loss, test_accuracy, save_path=os.path.join(config["save_dir"], "test_results.txt"))
+    save_results(test_loss, test_accuracy, save_path=os.path.join(config["save_dir"], f"test_results_{config['model']}.txt"))
 
 if __name__ == "__main__":
     test_network()
