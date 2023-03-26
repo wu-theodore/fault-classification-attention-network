@@ -18,7 +18,7 @@ label_map = {
 
 def load_test_data(data_dir, batch_size=1, shuffle=True):
     transforms = Compose([MinMaxScale()])
-    dataset = CAVSignalDataset(data_dir, transform=transforms, channel_first=True)
+    dataset = CAVSignalDataset(data_dir, transform=transforms)
     data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
     return data_loader
 

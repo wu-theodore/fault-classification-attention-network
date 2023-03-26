@@ -19,6 +19,7 @@ class AttentionNetwork(nn.Module):
         feedforward_size = config["feedforward_size"]
         num_encoders = config["num_encoders"]
         num_classes = config["num_classes"]
+        dropout = config["dropout"]
 
         self.device = device
         self.input_embedding = nn.Linear(state_size, model_size)
@@ -26,7 +27,7 @@ class AttentionNetwork(nn.Module):
 
         self.encoder_stacks = nn.ModuleList(
             [
-                EncoderStack(model_size, key_size, value_size, num_heads, feedforward_size)
+                EncoderStack(model_size, key_size, value_size, num_heads, feedforward_size, dropout)
                 for n in range(num_encoders)
             ]
         )

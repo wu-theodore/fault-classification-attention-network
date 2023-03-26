@@ -3,7 +3,7 @@ import torch.nn as nn
 from .ScaledDotProductAttention import ScaledDotProductAttention
 
 class MultiHeadAttention(nn.Module):
-    def __init__(self, model_size, key_size, value_size, num_heads):
+    def __init__(self, model_size, key_size, value_size, num_heads, dropout):
         super(MultiHeadAttention, self).__init__()
 
         # Configurable hyperparameters
@@ -12,9 +12,11 @@ class MultiHeadAttention(nn.Module):
         self.key_size = key_size            # d_k
         self.value_size = value_size        # d_v
 
+        self.dropout = dropout
+
         # Multi-head attention layer.
         self.attentions = nn.ModuleList(
-            [ScaledDotProductAttention(self.key_size, self.value_size, self.model_size) for i in range(self.h)]
+            [ScaledDotProductAttention(self.key_size, self.value_size, self.model_size, self.dropout) for i in range(self.h)]
         )
 
         # Final projection layer back to d_model

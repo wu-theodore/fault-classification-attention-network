@@ -6,10 +6,10 @@ from model.modules.PositionalFF import PositionalFeedForward
 from model.modules.ResidualAddAndNorm import ResidualAddAndNorm
 
 class EncoderStack(nn.Module):
-    def __init__(self, model_size, key_size, value_size, num_heads, feedforward_size):
+    def __init__(self, model_size, key_size, value_size, num_heads, feedforward_size, dropout):
         super().__init__()
 
-        self.multi_head_attention = MultiHeadAttention(model_size, key_size, value_size, num_heads)
+        self.multi_head_attention = MultiHeadAttention(model_size, key_size, value_size, num_heads, dropout)
         self.positional_ff = PositionalFeedForward(model_size, feedforward_size)
 
         self.residual = ResidualAddAndNorm(model_size)

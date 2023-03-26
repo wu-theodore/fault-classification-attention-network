@@ -6,7 +6,7 @@ from utils.test_utils import load_test_data, create_onnxruntime_session, run_inf
 
 def test_network():
     # Load config
-    with open("config_cnn.json", 'r') as f:
+    with open("config_attention.json", 'r') as f:
         config = json.load(f)
 
     # Load test data

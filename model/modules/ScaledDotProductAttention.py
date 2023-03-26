@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 class ScaledDotProductAttention(nn.Module):
-    def __init__(self, key_size, value_size, model_size):
+    def __init__(self, key_size, value_size, model_size, dropout):
         super(ScaledDotProductAttention, self).__init__()
 
         self.model_size = model_size        # d_model
@@ -13,6 +13,8 @@ class ScaledDotProductAttention(nn.Module):
         self.W_Q = nn.Linear(self.model_size, self.key_size)
         self.W_K = nn.Linear(self.model_size, self.key_size)
         self.W_V = nn.Linear(self.model_size, self.value_size)
+
+        self.dropout = nn.Dropout(dropout)
 
         self.softmax = nn.Softmax(dim=-1)
         self.scaling_factor = torch.rsqrt(
@@ -37,6 +39,7 @@ class ScaledDotProductAttention(nn.Module):
         
         unnormalized_attention = queries @ keys.transpose(2, 1) * self.scaling_factor
         attention_weights = self.softmax(unnormalized_attention)
+        attention_weights = self.dropout(attention_weights)
         
         context = attention_weights @ values
         return context, attention_weights
