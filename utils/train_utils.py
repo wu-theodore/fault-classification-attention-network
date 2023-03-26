@@ -6,12 +6,13 @@ from torch.utils.data import DataLoader, SubsetRandomSampler
 from model.AttentionNetwork import AttentionNetwork
 from model.RNNBaseline import RNNBaseline
 from model.DNNBaseline import DNNBaseline
+from model.CNNBaseline import CNNBaseline
 from sklearn.model_selection import KFold
 from utils.CAVSignalDataset import CAVSignalDataset
 from utils.Transforms import MinMaxScale
 
-def load_data(data_dir, batch_size=None, shuffle=True, num_folds=5, transform=MinMaxScale()):
-    dataset = CAVSignalDataset(data_dir, transform=transform)
+def load_data(data_dir, batch_size=None, shuffle=True, num_folds=5, transform=MinMaxScale(), channel_first=False):
+    dataset = CAVSignalDataset(data_dir, transform=transform, channel_first=channel_first)
     dataset_size = len(dataset)
     print(f"Dataset has {dataset_size} samples total.")
     kfold = KFold(n_splits=num_folds, shuffle=True)
@@ -42,6 +43,8 @@ def load_model(config, device):
         model = RNNBaseline(config, device)
     elif model_type == "dnn":
         model = DNNBaseline(config, device)
+    elif model_type == "cnn":
+        model = CNNBaseline(config, device)
     else:
         raise ValueError("Incorrect model passed.")
     model.to(device)

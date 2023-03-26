@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from utils.CAVSignalDataset import CAVSignalDataset
-from utils.Transforms import MinMaxScale, Sample, Compose
+from utils.Transforms import MinMaxScale, Sample, Compose, ExtractTimeDomainFeatures
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 
@@ -17,8 +17,8 @@ label_map = {
     }
 
 def load_test_data(data_dir, batch_size=1, shuffle=True):
-    transforms = Compose([MinMaxScale(), Sample(sample_freq=2)])
-    dataset = CAVSignalDataset(data_dir, transform=transforms)
+    transforms = Compose([MinMaxScale()])
+    dataset = CAVSignalDataset(data_dir, transform=transforms, channel_first=True)
     data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
     return data_loader
 

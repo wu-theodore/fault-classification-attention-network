@@ -4,11 +4,12 @@ import numpy as np
 from torch.utils.data import Dataset
 
 class CAVSignalDataset(Dataset):
-    def __init__(self, data_dir, transform=None, target_transform=None):
+    def __init__(self, data_dir, transform=None, target_transform=None, channel_first=False):
         self.labels = self.get_labels(data_dir)
         self.data_dir = data_dir
         self.transform = transform
         self.target_transform = target_transform
+        self.channel_first = channel_first
         self.label_map = {
             "actuator": 0,
             "attack": 1,
@@ -23,7 +24,9 @@ class CAVSignalDataset(Dataset):
     def __getitem__(self, index):
         file, label = self.labels[index]
         file_path = os.path.join(self.data_dir, label, file)
-        data = np.loadtxt(file_path, delimiter=',').T
+        data = np.loadtxt(file_path, delimiter=',')
+        if not self.channel_first:
+            data = data.T
         label = self.label_map[label]
         if self.transform:
             data = self.transform(data)

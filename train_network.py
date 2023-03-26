@@ -159,7 +159,7 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"PyTorch running on {device}")
     
-    with open("config_dnn.json", 'r') as f:
+    with open("config_cnn.json", 'r') as f:
         config = json.load(f)
 
     # Instantiate DataLoaders
@@ -167,7 +167,12 @@ def main():
         transform = Compose([ExtractTimeDomainFeatures(), MinMaxScale(1, 0)])
     else:
         transform = MinMaxScale()
-    data_loaders = load_data(config["train_data_dir"], batch_size=config["batch_size"], num_folds=config["num_folds"], transform=transform)
+    if config["model"] == "cnn":
+        channel_first = True
+    else:
+        channel_first = False
+    data_loaders = load_data(config["train_data_dir"], batch_size=config["batch_size"], 
+        num_folds=config["num_folds"], transform=transform, channel_first=channel_first)
     train_history_list = list()
     val_history_list = list()
 
@@ -200,6 +205,8 @@ def main():
     # Save trained model
     if config["model"] == "dnn":
         sample_input = torch.randn(size=(config["batch_size"], config["num_features"])).to(device)
+    if config["model"] == "cnn":
+        sample_input = torch.randn(size=(config["batch_size"], config["num_vehicles"], 500)).to(device)
     else:
         sample_input = torch.randn(size=(config["batch_size"], 500, config["state_size"])).to(device)
     save_model(model, sample_input, save_path=os.path.join(config["model_dir"], config["model"]))
