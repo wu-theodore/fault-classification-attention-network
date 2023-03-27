@@ -201,6 +201,15 @@ def main():
         if config["model"] == "attention" and config["visualize"]:
             plot_attention_weights_heatmap(device, model, val_loader, save_dir=os.path.join(config["save_dir"], f"{config['model']}_attention_heatmap.png"))
 
+        # Save trained model
+        if config["model"] == "dnn":
+            sample_input = torch.randn(size=(config["batch_size"], config["num_features"])).to(device)
+        if config["model"] == "cnn":
+            sample_input = torch.randn(size=(config["batch_size"], config["num_vehicles"], 500)).to(device)
+        else:
+            sample_input = torch.randn(size=(config["batch_size"], 500, config["state_size"])).to(device)
+        save_model(model, sample_input, save_path=os.path.join(config["model_dir"], f"{config['model']}_{fold}"))
+
     # Save all results
     save_metrics_history(train_history_list, save_path=os.path.join(config["save_dir"], f"{config['model']}_train_history")) 
     save_metrics_history(val_history_list, save_path=os.path.join(config["save_dir"], f"{config['model']}_val_history")) 
@@ -208,14 +217,6 @@ def main():
     # Plot history
     plot_history(train_history_list, val_history_list, save_dir=os.path.join(config["save_dir"], f"{config['model']}_training_curves.png"))
    
-    # Save trained model
-    if config["model"] == "dnn":
-        sample_input = torch.randn(size=(config["batch_size"], config["num_features"])).to(device)
-    if config["model"] == "cnn":
-        sample_input = torch.randn(size=(config["batch_size"], config["num_vehicles"], 500)).to(device)
-    else:
-        sample_input = torch.randn(size=(config["batch_size"], 500, config["state_size"])).to(device)
-    save_model(model, sample_input, save_path=os.path.join(config["model_dir"], config["model"]))
 
 
 if __name__ == "__main__":

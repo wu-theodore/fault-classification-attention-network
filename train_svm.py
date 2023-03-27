@@ -64,11 +64,13 @@ def main():
         train_history_list.append(train_history)
         val_history_list.append(val_history)
 
+        with open(os.path.join(config["model_dir"], f"{config['model']}_{fold}" + ".pickle"), "wb") as f:
+            pickle.dump(clf, f)
+
     if config["save_results"]:
         save_metrics_history(train_history_list, save_path=os.path.join(config["save_dir"], f"{config['model']}_train_history"), is_svm=True) 
         save_metrics_history(val_history_list, save_path=os.path.join(config["save_dir"], f"{config['model']}_val_history"), is_svm=True) 
-        with open(os.path.join(config["model_dir"], config["model"] + ".pickle"), "wb") as f:
-            pickle.dump(clf, f)
+        
 
 if __name__ == "__main__":
     main()
