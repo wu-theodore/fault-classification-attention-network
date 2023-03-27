@@ -5,30 +5,23 @@ class RNNBaseline(nn.Module):
     def __init__(self, config, device="cuda"):
         super().__init__()
         self.config = config
-
-        # Unpack config
-        state_size = self.config["state_size"]
-        model_size = self.config["model_size"]
-        num_encoders = self.config["num_encoders"]
-        num_classes = self.config["num_classes"]
-        self.hidden_size = self.config["value_size"]
-
         self.device = device
-        self.input_embedding = nn.Linear(state_size, model_size)
-        self.RNN = nn.LSTM(model_size, self.hidden_size, num_layers=num_encoders, 
-            batch_first=True, bidirectional=True)
-        self.classification_layer = nn.Linear(2*self.hidden_size, num_classes)
-        self.softmax = nn.Softmax(dim=1)
+
+        self.embedding_layer = nn.Linear(self.config["state_size"], self.config["embedding_size"])
+        self.RNN = nn.LSTM(self.config["embedding_size"], self.config["model_size"], num_layers=self.config["num_layers"], 
+            dropout=self.config["dropout"])
+        self.hidden_layer = nn.Linear(self.config["model_size"], self.config["hidden_layer_size"])
+        self.classification_layer = nn.Linear(self.config["hidden_layer_size"], self.config["num_classes"])
+        self.dropout = nn.Dropout(self.config["dropout"])
+        self.relu = nn.ReLU()
+        self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, input):
-        embedding = self.input_embedding(input)
-        output, (h_n, c_n) = self.RNN(embedding)
+        embedding = self.embedding_layer(input)
+        output, (h_n, c_n) = self.RNN(embedding.transpose(0, 1))
 
-        output_forward = output[:, -1, :self.hidden_size]
-        output_reverse = output[:, 0, self.hidden_size:]
-        stacked_encoder_state = torch.cat((output_forward, output_reverse), dim=1)
-
-        logits = self.classification_layer(stacked_encoder_state)
+        hidden_state = self.dropout(self.relu(self.hidden_layer(output[-1])))
+        logits = self.classification_layer(hidden_state)
         normalized_logits = self.softmax(logits)
 
         return normalized_logits

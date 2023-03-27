@@ -104,6 +104,16 @@ class ExtractTimeDomainFeatures(object):
         kurtosis = self.compute_KV(x)
         return kurtosis / (np.mean(x ** 2) ** 2)
 
+class Truncate(object):
+    """
+    Truncate the sequence. 
+    """
+    def __init__(self, truncate_size):
+        self.truncate_size = truncate_size
+
+    def __call__(self, sample):
+        return sample[:self.truncate_size]
+
 class Compose(object):
     """
     Composes multiple transform objects.

@@ -159,14 +159,17 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"PyTorch running on {device}")
     
-    with open("config_attention.json", 'r') as f:
+    with open("config_rnn.json", 'r') as f:
         config = json.load(f)
 
     # Instantiate DataLoaders
     if config["model"] == "dnn":
         transform = Compose([ExtractTimeDomainFeatures(), MinMaxScale(1, 0)])
+    elif config["model"] == "rnn":
+        transform = Compose([Truncate(100), MinMaxScale()])
     else:
         transform = MinMaxScale()
+
     if config["model"] == "cnn":
         channel_first = True
     else:
@@ -202,6 +205,9 @@ def main():
     save_metrics_history(train_history_list, save_path=os.path.join(config["save_dir"], f"{config['model']}_train_history")) 
     save_metrics_history(val_history_list, save_path=os.path.join(config["save_dir"], f"{config['model']}_val_history")) 
 
+    # Plot history
+    plot_history(train_history_list, val_history_list, save_dir=os.path.join(config["save_dir"], f"{config['model']}_training_curves.png"))
+   
     # Save trained model
     if config["model"] == "dnn":
         sample_input = torch.randn(size=(config["batch_size"], config["num_features"])).to(device)
@@ -211,9 +217,6 @@ def main():
         sample_input = torch.randn(size=(config["batch_size"], 500, config["state_size"])).to(device)
     save_model(model, sample_input, save_path=os.path.join(config["model_dir"], config["model"]))
 
-    # Plot history
-    plot_history(train_history_list, val_history_list, save_dir=os.path.join(config["save_dir"], f"{config['model']}_training_curves.png"))
-   
 
 if __name__ == "__main__":
     torch.manual_seed(0)
