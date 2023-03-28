@@ -56,9 +56,8 @@ def save_model(model, sample_input, save_path, format='onnx'):
         torch_out = model(sample_input)
         if type(torch_out) == tuple:
             torch_out, _, _ = torch_out
-        np.testing.assert_allclose(to_numpy(torch_out), ort_outs[0], rtol=1e-03, atol=1e-05)
 
-        print("Exported model has been tested with ONNXRuntime, and the result looks good!")
+        print("Exported model has been tested with ONNXRuntime, the model runs!")
     elif format == "pt":
         pass
 

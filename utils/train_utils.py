@@ -7,6 +7,7 @@ from model.AttentionNetwork import AttentionNetwork
 from model.RNNBaseline import RNNBaseline
 from model.DNNBaseline import DNNBaseline
 from model.CNNBaseline import CNNBaseline
+from model.MSALSTMCNNBaseline import MSALSTMCNNBaseline
 from sklearn.model_selection import KFold
 from utils.CAVSignalDataset import CAVSignalDataset
 from utils.Transforms import MinMaxScale
@@ -45,6 +46,8 @@ def load_model(config, device):
         model = DNNBaseline(config, device)
     elif model_type == "cnn":
         model = CNNBaseline(config, device)
+    elif model_type == "msalstm-cnn":
+        model = MSALSTMCNNBaseline(config, device)
     else:
         raise ValueError("Incorrect model passed.")
     model.to(device)

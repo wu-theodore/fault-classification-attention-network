@@ -159,7 +159,7 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"PyTorch running on {device}")
     
-    with open("config_rnn.json", 'r') as f:
+    with open("config_msalstmcnn.json", 'r') as f:
         config = json.load(f)
 
     # Instantiate DataLoaders
@@ -170,7 +170,7 @@ def main():
     else:
         transform = MinMaxScale()
 
-    if config["model"] == "cnn":
+    if config["model"] == "cnn" or config["model"] == "msalstm-cnn":
         channel_first = True
     else:
         channel_first = False
@@ -204,7 +204,7 @@ def main():
         # Save trained model
         if config["model"] == "dnn":
             sample_input = torch.randn(size=(config["batch_size"], config["num_features"])).to(device)
-        if config["model"] == "cnn":
+        if config["model"] == "cnn" or config["model"] == "msalstm-cnn":
             sample_input = torch.randn(size=(config["batch_size"], config["num_vehicles"], 500)).to(device)
         else:
             sample_input = torch.randn(size=(config["batch_size"], 500, config["state_size"])).to(device)
