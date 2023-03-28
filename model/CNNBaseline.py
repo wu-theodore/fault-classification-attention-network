@@ -32,7 +32,6 @@ class CNNBaseline(nn.Module):
 
         x = torch.mean(x, dim=-1)
         x = self.dropout(self.relu(self.fc1(x)))
-        output = self.fc2(x)
-        logits = self.softmax(output)
+        logits = self.fc2(x)
 
         return logits

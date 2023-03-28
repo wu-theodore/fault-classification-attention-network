@@ -32,7 +32,6 @@ class AttentionNetwork(nn.Module):
             ]
         )
         self.classification_layer = nn.Linear(model_size, num_classes)
-        self.softmax = nn.Softmax(dim=1)
 
 
     def forward(self, input):
@@ -65,7 +64,6 @@ class AttentionNetwork(nn.Module):
 
         reduced_embedding = torch.mean(embedding, dim=1)
         logits = self.classification_layer(reduced_embedding)
-        normalized_logits = self.softmax(logits)
 
-        return normalized_logits, stacked_attention_weights, stacked_embeddings
+        return logits, stacked_attention_weights, stacked_embeddings
 

@@ -17,13 +17,11 @@ class DNNBaseline(nn.Module):
         self.hidden_layer_1 = nn.Linear(num_features, num_features)
         self.hidden_layer_2 = nn.Linear(num_features, self.hidden_size)
         self.output_layer = nn.Linear(self.hidden_size, num_classes)
-        self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, input):
         x = F.relu(self.hidden_layer_1(input))
         x = F.relu(self.hidden_layer_2(x))
         
-        output = self.output_layer(x)
-        logits = self.softmax(output)
+        logits = self.output_layer(x)
 
         return logits

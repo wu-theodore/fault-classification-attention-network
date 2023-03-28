@@ -14,7 +14,6 @@ class RNNBaseline(nn.Module):
         self.classification_layer = nn.Linear(self.config["hidden_layer_size"], self.config["num_classes"])
         self.dropout = nn.Dropout(self.config["dropout"])
         self.relu = nn.ReLU()
-        self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, input):
         embedding = self.embedding_layer(input)
@@ -22,8 +21,7 @@ class RNNBaseline(nn.Module):
 
         hidden_state = self.dropout(self.relu(self.hidden_layer(output[-1])))
         logits = self.classification_layer(hidden_state)
-        normalized_logits = self.softmax(logits)
 
-        return normalized_logits
+        return logits
 
         
