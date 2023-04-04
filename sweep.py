@@ -1,4 +1,5 @@
 import wandb
+import gc
 from train_network import *
 from utils.train_utils import *
 
@@ -10,7 +11,8 @@ def sweep():
         print(f"PyTorch running on {device}")
 
         # Instantiate DataLoaders
-        train_loader, val_loader = load_data(config["data_dir"], config["train_val_split"], batch_size=config["batch_size"])
+        data_loaders = load_data(config["data_dir"], num_folds=config["num_folds"], batch_size=config["batch_size"])
+        data_loaders = data_loaders[0]
 
         # Instantiate Networks
         model = load_model(config, device)
@@ -20,8 +22,14 @@ def sweep():
         optimizer = optim.Adam(model.parameters(), lr=config["learning_rate"])
 
         # Train model
-        train(config, device, model, (train_loader, val_loader), criterion, optimizer, 
-              print_every=config["verbosity"], use_wandb=True, early_stop=True)
+        train(config, device, model, data_loaders, criterion, optimizer, 
+              print_every=config["verbosity"])
+
+        # Release data back to cuda
+        del model
+        gc.collect()
+        torch.cuda.empty_cache()
+        
 
 if __name__ == "__main__":
     sweep_config = {
@@ -32,20 +40,35 @@ if __name__ == "__main__":
             "goal": "minimize"
         },
         "parameters": {
-            "data_dir": {
-                "value": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\simulation_data_3_vehicles"
+            "use_wandb": {
+                "value": True
             },
-            "train_val_split": {
-                "value": 0.80
+            "data_dir": {
+                "value": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\simulation_data_3v"
+            },
+            "num_folds": {
+                "value": 5
             },
             "verbosity": {
                 "value": 10
+            },
+            "dropout": {
+                "value": 0.2
             },
             "model": {
                 "value": "attention"
             },
             "epochs": {
                 "value": 200
+            },
+            "use_checkpoint": {
+                "value": False
+            },
+            "use_early_stop": {
+                "value": True
+            },
+            "early_stop_patience": {
+                "value": 5
             },
             "state_size": {
                 "value": 3
@@ -54,20 +77,20 @@ if __name__ == "__main__":
                 "value": 5
             },
             "learning_rate": {
-                "values": [0.001, 0.0003]
+                "values": [0.001]
             },
             "batch_size": {
-                "values": [32, 64, 128]
+                "values": [32]
             },
             "model_size": {
-                "values": [8, 16, 32, 64]
+                "values": [16, 32, 64]
             },
             "value_size": {
-                "values": [16, 32, 64, 128, 256]
+                "values": [16, 32, 64]
             },
             "num_heads": {
                 "min": 1,
-                "max": 16
+                "max": 5
             },
             "feedforward_size": {
                 "values": [16, 32, 64]
@@ -79,7 +102,7 @@ if __name__ == "__main__":
         }
     }
 
-    sweep_count = 1
+    sweep_count = 20
     project_name = "fault_classification_cav"
     sweep_id = wandb.sweep(sweep_config, project=project_name)
     wandb.agent(sweep_id, function=sweep, count=sweep_count)
