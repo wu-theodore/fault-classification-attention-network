@@ -1,16 +1,17 @@
 import os
+import sys
 import json
 import pickle
 
 from utils.test_utils import load_test_data, compare_pred_result, save_results, create_confusion_matrix
 
-def test_svm():
+def test_svm(noise_var):
     # Load config
     with open("config_svm.json", 'r') as f:
         config = json.load(f)
 
     # Load test data
-    test_loader = load_test_data(config["test_data_dir"])
+    test_loader = load_test_data(config["test_data_dir"], config["model"], noise_var=noise_var)
     test_loss = []
     test_accuracy = []
     for fold in range(config["num_folds"]):
@@ -46,4 +47,8 @@ def test_svm():
     save_results("N/A", test_accuracy, save_path=os.path.join(config["save_dir"], f"test_results_{config['model']}.txt"))
 
 if __name__ == "__main__":
-    test_svm()
+    if len(sys.argv) == 2:
+        noise_var = float(sys.argv[1])
+    else:
+        noise_var = 0
+    test_svm(noise_var)
