@@ -49,14 +49,15 @@ def run_inference(ort_session, sample):
     ort_outs = ort_session.run(None, ort_inputs)
     return ort_outs[0]
 
-def compare_pred_result(output, label, criterion):
+def compare_pred_result(output, label, criterion, print_result=False):
     if type(output) != torch.TensorType:
         output = torch.tensor(output, dtype=torch.float)
 
     loss = criterion(output, label).item()
     pred = torch.argmax(output, dim=1)
     correct = (pred == label).item()
-    print(f"Model predicted class {label_map[pred.item()]}, true class was {label_map[label.item()]}")
+    if print_result:
+        print(f"Model predicted class {label_map[pred.item()]}, true class was {label_map[label.item()]}")
     return loss, pred, correct
 
 def save_results(loss, acc, save_path):

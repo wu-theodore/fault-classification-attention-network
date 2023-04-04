@@ -41,7 +41,7 @@ def test_network(config_file, noise_var):
         test_loss.append(running_loss / total_samples)
         test_accuracy.append(num_correct / total_samples)
 
-        create_confusion_matrix(preds, labels, save_path=os.path.join(config["save_dir"], f"{config['model']}_{fold}_cm.eps"), show=True)
+        create_confusion_matrix(preds, labels, save_path=os.path.join(config["save_dir"], f"{config['model']}_{fold}_cm.eps"), show=False)
         
     save_results(test_loss, test_accuracy, save_path=os.path.join(config["save_dir"], f"test_results_{config['model']}.txt"))
 
