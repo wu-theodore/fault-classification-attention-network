@@ -114,6 +114,18 @@ class Truncate(object):
     def __call__(self, sample):
         return sample[:self.truncate_size]
 
+class GaussianNoise(object):
+    """
+    Add Gaussian noise to the signal.
+    """
+    def __init__(self, mean=0, variance=0.1):
+        self.mean = mean
+        self.variance = variance
+
+    def __call__(self, sample):
+        noise = np.random.normal(self.mean, self.variance, size=sample.shape)
+        return sample + noise
+
 class Compose(object):
     """
     Composes multiple transform objects.

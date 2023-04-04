@@ -35,7 +35,7 @@ def plot_curve(ax, x_data, y_data, label, title, ylabel):
     ax.set_title(title)
 
 
-def plot_attention_weights_heatmap(device, model, data_loader, show=True, save_dir=None):
+def plot_attention_weights_heatmap(device, model, data_loader, show=False, save_dir=None):
     """
     Take the first signal in data_loader and visualize attention weights.
     """
@@ -52,15 +52,13 @@ def plot_attention_weights_heatmap(device, model, data_loader, show=True, save_d
 
             sample_input = inputs[0, :].cpu().squeeze().numpy()
             sample_label = labels[0].cpu().item()
-            sample_weights = torch.squeeze(weights)[0, :, :].cpu().squeeze().numpy()
-            plot_heatmap(sample_input, sample_label, sample_weights)
+            sample_weights = weights[-1, 0, :, :].cpu().squeeze().numpy()
 
-    if save_dir:
-        plt.savefig(save_dir)
-    if show: 
-        plt.show()
+            plot_heatmap(sample_input, sample_label, sample_weights, save_dir, show)
+            break
 
-def plot_heatmap(sample, label, weights):
+
+def plot_heatmap(sample, label, weights, save_dir=None, show=None):
     label_map = {
         0: "actuator",
         1: "attack",
@@ -74,25 +72,23 @@ def plot_heatmap(sample, label, weights):
 
     x = np.arange(sample.shape[0])
 
-    # Plot the sample
-    fig, ax = plt.subplots(num_heads + 1, 1, figsize=(16, 8))
-    ax[0].plot(x, sample, label=[f"{label_map[label]}_{j}" for j in range(3)])
-    ax[0].legend(loc="upper right", prop={'size': 8})
-    ax[0].tick_params(axis='x', labelsize=8)
-    ax[0].set_xticks(range(0, seq_len, 20))
-
     for head in range(num_heads):
-        attention_head_weights = weights[:, head*seq_len:(head + 1)*seq_len]
-        weighted_sample = attention_head_weights @ sample
-        im = ax[head + 1].matshow(weighted_sample.T, cmap='viridis', aspect="auto")
-        ax[head + 1].set_xticks(range(0, seq_len, 20))
-        ax[head + 1].xaxis.set_ticks_position("bottom")
-        ax[head + 1].set_ylabel(f"Head {head + 1} of {num_heads}")
-        plt.colorbar(im, ax=ax[head + 1], fraction=0.046, pad=0.01)
-        
+        # Plot the sample
+        fig, ax = plt.subplots(2, 1, sharex=True, figsize=(12, 8), constrained_layout=True)
 
-        
-        
-    
+        ax[0].plot(x, sample, label=[f"{label_map[label]}_{j}" for j in range(3)])
+        ax[0].legend(loc="upper right", prop={'size': 8})
+        ax[0].tick_params(axis='x', labelsize=8)
+        ax[0].set_xticks(range(0, seq_len, 20))
 
-        
+        attention_head_weights = weights[:1, head*seq_len:(head + 1)*seq_len]
+        im = ax[1].matshow(attention_head_weights, cmap='viridis', aspect="auto")
+        ax[1].set_xticks(range(0, seq_len, 20))
+        ax[1].xaxis.set_ticks_position("bottom")
+        ax[1].set_title(f"Head {head + 1} of {num_heads}")
+        plt.colorbar(im, ax=ax[1], fraction=0.046, pad=0.01)
+
+        if save_dir:
+            plt.savefig(save_dir + f"_head{head + 1}_attention_heatmap.png")
+        if show:
+            plt.show()

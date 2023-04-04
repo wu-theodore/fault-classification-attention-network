@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import wandb
 import torch
@@ -40,6 +41,8 @@ def train_one_epoch(device, model, data_loader, criterion, optimizer):
         running_loss += batch_loss
         batch_num += 1
 
+        del loss
+
     train_loss = running_loss / batch_num
     train_accuracy = running_batch_accuracy / batch_num
     torch.cuda.empty_cache()
@@ -70,12 +73,14 @@ def validate(device, model, data_loader, criterion):
             running_batch_accuracy += batch_accuracy
             running_loss += batch_loss
             batch_num += 1
+
+            del loss
             
     val_loss = running_loss / batch_num
     val_accuracy = running_batch_accuracy / batch_num
     return val_loss, val_accuracy
 
-def train(config, device, model, data, criterion, optimizer, print_every=100, save_every=10, use_checkpoint=False):
+def train(config, device, model, data, criterion, optimizer, print_every=100, save_every=10):
     use_wandb = config["use_wandb"]
     use_checkpoint = config["use_checkpoint"]
     use_early_stop = config["use_early_stop"]
@@ -155,18 +160,18 @@ def train(config, device, model, data, criterion, optimizer, print_every=100, sa
 
     return train_history, val_history
 
-def main():
+def main(config_file):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"PyTorch running on {device}")
     
-    with open("config_msalstmcnn.json", 'r') as f:
+    with open(config_file, 'r') as f:
         config = json.load(f)
 
     # Instantiate DataLoaders
-    if config["model"] == "dnn":
+    if config["model"] == "mlp":
         transform = Compose([ExtractTimeDomainFeatures(), MinMaxScale(1, 0)])
     elif config["model"] == "rnn":
-        transform = Compose([Truncate(100), MinMaxScale()])
+        transform = Compose([Truncate(150), MinMaxScale()])
     else:
         transform = MinMaxScale()
 
@@ -199,12 +204,12 @@ def main():
 
         # Visualize attention weights
         if config["model"] == "attention" and config["visualize"]:
-            plot_attention_weights_heatmap(device, model, val_loader, save_dir=os.path.join(config["save_dir"], f"{config['model']}_attention_heatmap.png"))
+            plot_attention_weights_heatmap(device, model, val_loader, show=False, save_dir=os.path.join(config["save_dir"], f"{config['model']}_{fold}"))
 
         # Save trained model
-        if config["model"] == "dnn":
+        if config["model"] == "mlp":
             sample_input = torch.randn(size=(config["batch_size"], config["num_features"])).to(device)
-        if config["model"] == "cnn" or config["model"] == "msalstm-cnn":
+        elif config["model"] == "cnn" or config["model"] == "msalstm-cnn":
             sample_input = torch.randn(size=(config["batch_size"], config["num_vehicles"], 500)).to(device)
         else:
             sample_input = torch.randn(size=(config["batch_size"], 500, config["state_size"])).to(device)
@@ -221,6 +226,8 @@ def main():
 
 if __name__ == "__main__":
     torch.manual_seed(0)
-    main()
+
+    assert len(sys.argv) == 2, "Incorrect number of arguments. Expected: python train_network.py <config_file>"
+    main(config_file=sys.argv[-1])
 
 

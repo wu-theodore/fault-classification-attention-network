@@ -1,16 +1,17 @@
 import os
+import sys
 import json
 import torch.nn as nn
 
 from utils.test_utils import load_test_data, create_onnxruntime_session, run_inference, compare_pred_result, save_results, create_confusion_matrix
 
-def test_network():
+def test_network(config_file, noise_var):
     # Load config
-    with open("config_msalstmcnn.json", 'r') as f:
+    with open(config_file, 'r') as f:
         config = json.load(f)
 
     # Load test data
-    test_loader = load_test_data(config["test_data_dir"])
+    test_loader = load_test_data(config["test_data_dir"], config["model"], noise_var=noise_var)
     criterion = nn.CrossEntropyLoss()
 
     test_loss = []
@@ -45,4 +46,10 @@ def test_network():
     save_results(test_loss, test_accuracy, save_path=os.path.join(config["save_dir"], f"test_results_{config['model']}.txt"))
 
 if __name__ == "__main__":
-    test_network()
+    assert len(sys.argv) == 2 or len(sys.argv) == 3, "Incorrect number of arguments. Expected: python test_network.py <config_file>"
+    if len(sys.argv) == 3:
+        noise_var = float(sys.argv[2])
+    else:
+        noise_var = 0
+
+    test_network(config_file=sys.argv[1], noise_var=noise_var)

@@ -28,7 +28,6 @@ def test_svm():
         for sample, label in test_loader:
             sample = sample.numpy()
             sample = sample.reshape(sample.shape[0], -1)
-            sample = sample.repeat(2, axis=-1)
             label = label.numpy()
             
             pred = clf.predict(sample)

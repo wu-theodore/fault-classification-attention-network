@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import DataLoader
 
 from utils.CAVSignalDataset import CAVSignalDataset
-from utils.Transforms import MinMaxScale, Sample, Compose, ExtractTimeDomainFeatures
+from utils.Transforms import MinMaxScale, Sample, Compose, ExtractTimeDomainFeatures, GaussianNoise
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 
@@ -16,9 +16,21 @@ label_map = {
         4: "Drunk",
     }
 
-def load_test_data(data_dir, batch_size=1, shuffle=True):
-    transforms = Compose([MinMaxScale()])
-    dataset = CAVSignalDataset(data_dir, transform=transforms)
+def load_test_data(data_dir, model, noise_var=0, batch_size=1, shuffle=True):
+    if model == "mlp":
+        transforms = [ExtractTimeDomainFeatures(), MinMaxScale(1, 0)]
+    else:
+        transforms = [MinMaxScale()] 
+    if noise_var:
+        transforms.append(GaussianNoise(variance=noise_var))
+    transforms = Compose(transforms)
+    
+    if model == "cnn" or model == "msalstm-cnn":
+        channel_first = True
+    else:
+        channel_first = False
+
+    dataset = CAVSignalDataset(data_dir, transform=transforms, channel_first=channel_first) 
     data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
     return data_loader
 
@@ -62,6 +74,6 @@ def create_confusion_matrix(output, label, save_path=None, show=False):
     plt.ylabel("True Label", **font)
     plt.yticks(**font)
     if save_path:
-        plt.savefig(save_path, format='eps')
+        plt.savefig(save_path, format='eps', dpi=600)
     if show:
         plt.show()

@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader, SubsetRandomSampler
 
 from model.AttentionNetwork import AttentionNetwork
 from model.RNNBaseline import RNNBaseline
-from model.DNNBaseline import DNNBaseline
+from model.MLPBaseline import MLPBaseline
 from model.CNNBaseline import CNNBaseline
 from model.MSALSTMCNNBaseline import MSALSTMCNNBaseline
 from sklearn.model_selection import KFold
@@ -42,8 +42,8 @@ def load_model(config, device):
         model = AttentionNetwork(config, device)
     elif model_type == "rnn":
         model = RNNBaseline(config, device)
-    elif model_type == "dnn":
-        model = DNNBaseline(config, device)
+    elif model_type == "mlp":
+        model = MLPBaseline(config, device)
     elif model_type == "cnn":
         model = CNNBaseline(config, device)
     elif model_type == "msalstm-cnn":

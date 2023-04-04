@@ -62,7 +62,8 @@ class AttentionNetwork(nn.Module):
         stacked_attention_weights = torch.stack(attention_weights_list)
         stacked_embeddings = torch.stack(embedding_list)
 
-        reduced_embedding = torch.mean(embedding, dim=1)
+        # reduced_embedding = torch.mean(embedding, dim=1)
+        reduced_embedding = embedding[:, 0]
         logits = self.classification_layer(reduced_embedding)
 
         return logits, stacked_attention_weights, stacked_embeddings

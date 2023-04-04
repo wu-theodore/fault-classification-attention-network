@@ -10,7 +10,7 @@
     "num_folds": 5,
     "model": "rnn",
     "use_early_stop": true,
-    "early_stop_patience": 15,
+    "early_stop_patience": 5,
     "use_wandb": false,
     "use_checkpoint": false,
     "visualize": false,

@@ -8,7 +8,7 @@
     "batch_size": 100,
     "learning_rate": 0.001,
     "num_folds": 5,
-    "model": "dnn",
+    "model": "mlp",
     "use_early_stop": true,
     "early_stop_patience": 10,
     "use_wandb": false,
