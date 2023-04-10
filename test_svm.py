@@ -3,7 +3,7 @@ import sys
 import json
 import pickle
 
-from utils.test_utils import load_test_data, compare_pred_result, save_results, create_confusion_matrix
+from utils.test_utils import load_test_data, compare_pred_result, save_results, create_confusion_matrix, compute_binary_pred_metrics
 
 def test_svm(noise_var):
     # Load config
@@ -14,6 +14,9 @@ def test_svm(noise_var):
     test_loader = load_test_data(config["test_data_dir"], config["model"], noise_var=noise_var)
     test_loss = []
     test_accuracy = []
+    precisions = []
+    recalls = []
+    f1s = []
     for fold in range(config["num_folds"]):
         # Load model
         with open(os.path.join(config["model_dir"], f"{config['model']}_{fold}" + ".pickle"), "rb") as f:
@@ -42,9 +45,13 @@ def test_svm(noise_var):
         test_loss.append(running_loss / total_samples)
         test_accuracy.append(num_correct / total_samples)
 
-        create_confusion_matrix(preds, labels, save_path=os.path.join(config["save_dir"], f"{config['model']}_{fold}_cm.eps"), show=False)
+        create_confusion_matrix(preds, labels, save_path=os.path.join(config["save_dir"], f"{config['model']}_{fold}_cm.png"), show=False)
+        precision, recall, f1, support = compute_binary_pred_metrics(preds, labels)
+        precisions.append(precision)
+        recalls.append(recall)
+        f1s.append(f1)
 
-    save_results("N/A", test_accuracy, save_path=os.path.join(config["save_dir"], f"test_results_{config['model']}.txt"))
+    save_results("N/A", test_accuracy, precisions, recalls, f1s, save_path=os.path.join(config["save_dir"], f"test_results_{config['model']}.txt"))
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:

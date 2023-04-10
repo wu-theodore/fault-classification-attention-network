@@ -5,7 +5,9 @@ from torch.utils.data import DataLoader
 
 from utils.CAVSignalDataset import CAVSignalDataset
 from utils.Transforms import MinMaxScale, Sample, Compose, ExtractTimeDomainFeatures, GaussianNoise
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, precision_recall_fscore_support
+import scipy.stats as stats
+import numpy as np
 import matplotlib.pyplot as plt
 
 label_map = {
@@ -25,7 +27,7 @@ def load_test_data(data_dir, model, noise_var=0, batch_size=1, shuffle=True):
         transforms.append(GaussianNoise(variance=noise_var))
     transforms = Compose(transforms)
     
-    if model == "cnn" or model == "msalstm-cnn":
+    if model == "cnn" or model == "msalstm-cnn" or model == "attention-cnn":
         channel_first = True
     else:
         channel_first = False
@@ -60,10 +62,27 @@ def compare_pred_result(output, label, criterion, print_result=False):
         print(f"Model predicted class {label_map[pred.item()]}, true class was {label_map[label.item()]}")
     return loss, pred, correct
 
-def save_results(loss, acc, save_path):
+def compute_binary_pred_metrics(pred, true):
+    return precision_recall_fscore_support(true, pred, average=None, labels=list(label_map.keys()))
+
+def save_results(loss, acc, precision, recall, f1, save_path):
+    def compute_ci(data, alpha=0.95):
+        ci_low, ci_high = stats.t.interval(alpha, len(data)-1, loc=np.mean(data), scale=stats.sem(data))
+        return (ci_high - ci_low) / 2
+
+    # Precision, recall, and f1 currently list of arrays, convert to 2d array
+    precision = np.stack(precision, axis=0)
+    recall = np.stack(recall, axis=0)
+    f1 = np.stack(f1, axis=0)
+
     with open(save_path, 'w') as f:
         f.write(f"Test Loss: {loss}\n")
-        f.write(f"Test Accuracy: {acc}")
+        f.write(f"Test Accuracy: {np.mean(acc)} +- {compute_ci(acc)}, \t\t {acc}\n")
+        for i in range(len(label_map)):
+            f.write("\n")
+            f.write(f"Precision of class {i}: {np.mean(precision[:, i])} +- {compute_ci(precision[:, i])}, \t\t {precision[:, i]}\n")
+            f.write(f"Recall of class {i}: {np.mean(recall[:, i])} +- {compute_ci(recall[:, i])}, \t\t {recall[:, i]}\n")
+            f.write(f"F1 of class {i}: {np.mean(f1[:, i])} +- {compute_ci(f1[:, i])}, \t\t {f1[:, i]}\n")
     
 def create_confusion_matrix(output, label, save_path=None, show=False):
     cm = confusion_matrix(label, output)
@@ -75,6 +94,7 @@ def create_confusion_matrix(output, label, save_path=None, show=False):
     plt.ylabel("True Label", **font)
     plt.yticks(**font)
     if save_path:
-        plt.savefig(save_path, format='eps', dpi=600)
+        plt.savefig(save_path)
     if show:
         plt.show()
+    plt.close()

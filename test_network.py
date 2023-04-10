@@ -3,7 +3,7 @@ import sys
 import json
 import torch.nn as nn
 
-from utils.test_utils import load_test_data, create_onnxruntime_session, run_inference, compare_pred_result, save_results, create_confusion_matrix
+from utils.test_utils import load_test_data, create_onnxruntime_session, run_inference, compare_pred_result, save_results, create_confusion_matrix, compute_binary_pred_metrics
 
 def test_network(config_file, noise_var):
     # Load config
@@ -16,6 +16,9 @@ def test_network(config_file, noise_var):
 
     test_loss = []
     test_accuracy = []
+    precisions = []
+    recalls = []
+    f1s = []
     for fold in range(config["num_folds"]):
         # Create OnnxRuntime session
         onnx_model_path = os.path.join(config["model_dir"], f"{config['model']}_{fold}" + ".onnx")
@@ -41,9 +44,13 @@ def test_network(config_file, noise_var):
         test_loss.append(running_loss / total_samples)
         test_accuracy.append(num_correct / total_samples)
 
-        create_confusion_matrix(preds, labels, save_path=os.path.join(config["save_dir"], f"{config['model']}_{fold}_cm.eps"), show=False)
+        create_confusion_matrix(preds, labels, save_path=os.path.join(config["save_dir"], f"{config['model']}_{fold}_cm.png"), show=False)
+        precision, recall, f1, support = compute_binary_pred_metrics(preds, labels)
+        precisions.append(precision)
+        recalls.append(recall)
+        f1s.append(f1)
         
-    save_results(test_loss, test_accuracy, save_path=os.path.join(config["save_dir"], f"test_results_{config['model']}.txt"))
+    save_results(test_loss, test_accuracy, precisions, recalls, f1s, save_path=os.path.join(config["save_dir"], f"test_results_{config['model']}.txt"))
 
 if __name__ == "__main__":
     assert len(sys.argv) == 2 or len(sys.argv) == 3, "Incorrect number of arguments. Expected: python test_network.py <config_file>"

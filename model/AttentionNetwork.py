@@ -9,8 +9,10 @@ class AttentionNetwork(nn.Module):
     def __init__(self, config, device="cuda"):
         super().__init__()
 
+        self.config = config
+
         # Unpack config
-        state_size = config["state_size"]
+        state_size = config["num_vehicles"]
         model_size = config["model_size"]
         value_size = config["value_size"]
         #key_size = config["key_size"]
@@ -21,8 +23,14 @@ class AttentionNetwork(nn.Module):
         num_classes = config["num_classes"]
         dropout = config["dropout"]
 
+        embedding = config["embedding_type"]
+
         self.device = device
-        self.input_embedding = nn.Linear(state_size, model_size)
+        if embedding == "cnn":
+            self.input_embedding = nn.Conv1d(state_size, model_size, kernel_size=10)
+        else:
+            self.input_embedding = nn.Linear(state_size, model_size)
+        
         self.positional_encoding = PositionalEncoding(model_size)
 
         self.encoder_stacks = nn.ModuleList(
@@ -44,11 +52,13 @@ class AttentionNetwork(nn.Module):
             output: Output classification logits of shape (batch_size x num_classes)
             stacked_embeddings: The output embeddings at each encoder layer in the network.
             stacked_attention_weights: The attention weights for each encoder layer in the network.
-        """
-        seq_len = input.shape[1]
-        pos_encoding = self.positional_encoding.generate_encoding()[:seq_len]
+        """        
+        embedding = self.input_embedding(input)
+        if self.config["embedding_type"] == "cnn":
+            embedding = embedding.transpose(1, 2)
+        pos_encoding = self.positional_encoding.generate_encoding()[:embedding.shape[1]]
         pos_encoding = pos_encoding.to(self.device)
-        embedding = self.input_embedding(input) + pos_encoding
+        embedding = embedding + pos_encoding
 
         # Keep track of states throughout the model.
         attention_weights_list = []

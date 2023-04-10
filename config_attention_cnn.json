@@ -5,22 +5,26 @@
     "model_dir": "C:\\Users\\theow\\Documents\\Courses\\Year 4\\Thesis\\Code\\onnx",
 
     "epochs": 150,
-    "batch_size": 100,
-    "learning_rate": 0.005,
+    "batch_size": 32,
+    "learning_rate": 0.001,
     "num_folds": 5,
-    "model": "rnn",
+    "model": "attention-cnn",
     "use_early_stop": true,
-    "early_stop_patience": 10,
+    "early_stop_patience": 5,
     "use_wandb": false,
     "use_checkpoint": false,
-    "visualize": false,
+    "visualize": true,
 
-    "state_size": 3,
-    "embedding_size": 64,
-    "model_size": 256,
-    "hidden_layer_size": 25, 
-    "num_layers": 2,
-    "dropout": 0.1,
+    "num_vehicles": 3,
+    "model_size": 32,
+    "value_size": 32,
+    "num_heads": 5,
+    "feedforward_size": 64,
+    "num_encoders": 3,
+
+    "dropout": 0.2,
+
+    "embedding_type": "cnn",
 
     "num_classes": 5,
 

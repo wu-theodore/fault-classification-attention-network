@@ -25,6 +25,8 @@ def plot_history(train_history_list, val_history_list, show=True, save_dir=None)
         plt.savefig(save_dir)
     if show: 
         plt.show()
+
+    plt.close()
     
 
 def plot_curve(ax, x_data, y_data, label, title, ylabel):
@@ -92,3 +94,4 @@ def plot_heatmap(sample, label, weights, save_dir=None, show=None):
             plt.savefig(save_dir + f"_head{head + 1}_attention_heatmap.png")
         if show:
             plt.show()
+    plt.close()

@@ -38,7 +38,7 @@ def load_data(data_dir, batch_size=None, shuffle=True, num_folds=5, transform=Mi
 
 def load_model(config, device):
     model_type = config["model"]
-    if model_type == "attention":
+    if model_type == "attention" or model_type == "attention-cnn":
         model = AttentionNetwork(config, device)
     elif model_type == "rnn":
         model = RNNBaseline(config, device)

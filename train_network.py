@@ -171,11 +171,11 @@ def main(config_file):
     if config["model"] == "mlp":
         transform = Compose([ExtractTimeDomainFeatures(), MinMaxScale(1, 0)])
     elif config["model"] == "rnn":
-        transform = Compose([Truncate(150), MinMaxScale()])
+        transform = Compose([Truncate(100), MinMaxScale()])
     else:
         transform = MinMaxScale()
 
-    if config["model"] == "cnn" or config["model"] == "msalstm-cnn":
+    if config["model"] == "cnn" or config["model"] == "msalstm-cnn" or config["model"] == "attention-cnn":
         channel_first = True
     else:
         channel_first = False
@@ -209,7 +209,7 @@ def main(config_file):
         # Save trained model
         if config["model"] == "mlp":
             sample_input = torch.randn(size=(config["batch_size"], config["num_features"])).to(device)
-        elif config["model"] == "cnn" or config["model"] == "msalstm-cnn":
+        elif config["model"] == "cnn" or config["model"] == "msalstm-cnn" or config["model"] == "attention-cnn":
             sample_input = torch.randn(size=(config["batch_size"], config["num_vehicles"], 500)).to(device)
         else:
             sample_input = torch.randn(size=(config["batch_size"], 500, config["state_size"])).to(device)
