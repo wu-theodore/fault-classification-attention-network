@@ -27,7 +27,7 @@ class AttentionNetwork(nn.Module):
 
         self.device = device
         if embedding == "cnn":
-            self.input_embedding = nn.Conv1d(state_size, model_size, kernel_size=10)
+            self.input_embedding = nn.Conv1d(state_size, model_size, kernel_size=config['kernel_size'])
         else:
             self.input_embedding = nn.Linear(state_size, model_size)
         

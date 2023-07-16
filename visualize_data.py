@@ -41,8 +41,8 @@ def visualize_data():
     data_loaders = load_data(config["train_data_dir"], batch_size=1, shuffle=True)
     test_loader = load_test_data(config["test_data_dir"], model=config["model"])
 
-    visualize_signal(data_loaders[0][0], title="Training Data Signal", save_dir=os.path.join(config["save_dir"], "train_data_distribution"))
-    visualize_signal(test_loader, title="Test Data Signal", save_dir=os.path.join(config["save_dir"], "test_data_distribution"))
+    visualize_signal(data_loaders[0][0], title="Training Data Signal", save_dir=os.path.join(config["save_dir"], "train_data_distribution"), show=False)
+    visualize_signal(test_loader, title="Test Data Signal", save_dir=os.path.join(config["save_dir"], "test_data_distribution"), show=False)
 
 
 if __name__ == "__main__":

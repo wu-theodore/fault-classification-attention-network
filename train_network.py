@@ -173,7 +173,7 @@ def main(config_file):
     elif config["model"] == "rnn":
         transform = Compose([Truncate(100), MinMaxScale()])
     else:
-        transform = MinMaxScale()
+        transform = Compose([MinMaxScale()])
 
     if config["model"] == "cnn" or config["model"] == "msalstm-cnn" or config["model"] == "attention-cnn":
         channel_first = True
@@ -212,7 +212,7 @@ def main(config_file):
         elif config["model"] == "cnn" or config["model"] == "msalstm-cnn" or config["model"] == "attention-cnn":
             sample_input = torch.randn(size=(config["batch_size"], config["num_vehicles"], 500)).to(device)
         else:
-            sample_input = torch.randn(size=(config["batch_size"], 500, config["state_size"])).to(device)
+            sample_input = torch.randn(size=(config["batch_size"], 500, config["num_vehicles"])).to(device)
         save_model(model, sample_input, save_path=os.path.join(config["model_dir"], f"{config['model']}_{fold}"))
 
     # Save all results
@@ -220,7 +220,7 @@ def main(config_file):
     save_metrics_history(val_history_list, save_path=os.path.join(config["save_dir"], f"{config['model']}_val_history")) 
 
     # Plot history
-    plot_history(train_history_list, val_history_list, save_dir=os.path.join(config["save_dir"], f"{config['model']}_training_curves.png"))
+    plot_history(train_history_list, val_history_list, save_dir=os.path.join(config["save_dir"], f"{config['model']}_training_curves.png"), show=False)
    
 
 

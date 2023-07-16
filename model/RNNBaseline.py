@@ -7,7 +7,7 @@ class RNNBaseline(nn.Module):
         self.config = config
         self.device = device
 
-        self.embedding_layer = nn.Linear(self.config["state_size"], self.config["embedding_size"])
+        self.embedding_layer = nn.Linear(self.config["num_vehicles"], self.config["embedding_size"])
         self.RNN = nn.LSTM(self.config["embedding_size"], self.config["model_size"], num_layers=self.config["num_layers"], 
             dropout=self.config["dropout"])
         self.hidden_layer = nn.Linear(self.config["model_size"], self.config["hidden_layer_size"])

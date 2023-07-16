@@ -10,9 +10,9 @@ from model.CNNBaseline import CNNBaseline
 from model.MSALSTMCNNBaseline import MSALSTMCNNBaseline
 from sklearn.model_selection import KFold
 from utils.CAVSignalDataset import CAVSignalDataset
-from utils.Transforms import MinMaxScale
+from utils.Transforms import MinMaxScale, Compose, GaussianNoise
 
-def load_data(data_dir, batch_size=None, shuffle=True, num_folds=5, transform=MinMaxScale(), channel_first=False):
+def load_data(data_dir, batch_size=None, shuffle=True, num_folds=5, transform=Compose([MinMaxScale()]), channel_first=False):
     dataset = CAVSignalDataset(data_dir, transform=transform, channel_first=channel_first)
     dataset_size = len(dataset)
     print(f"Dataset has {dataset_size} samples total.")
